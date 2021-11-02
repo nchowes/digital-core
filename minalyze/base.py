@@ -7,7 +7,7 @@ class PlotMixin:
 
         items = self.element( element )
 
-        fig, ax = plt.subplots(1, len(items))
+        fig, ax = plt.subplots(1, len(items), figsize=(12,8))
         for i, item in enumerate(items):
             self.plot( ax[i], item )
             
