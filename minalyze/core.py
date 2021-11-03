@@ -39,33 +39,40 @@ class Geochem(PreprocessMixin, PlotMixin):
     def __init__(self):
         self.data = []
         self.prepared = []
-        self.__original = []
-
+        self.figure = []
+        self._original = []
+        
     def head(self):
         """Return the first 5 rows of geochem dataframe"""
         if len(self.data) != 0:
-           this = self.data.head()
-           display(this)
+           value = self.data.head()
+           display(value)
 
     def tail(self):
         """Return the last 5 rows of geochem dataframe"""
         if len(self.data) != 0:
-           this = self.data.tail()
-           display(this)
+           value = self.data.tail()
+           display(value)
 
     def reset(self):
         """Reset data"""
-        self.data = self.__original
+        self.data = self._original.copy(deep=True)
         self.prepared = []
+        self.figure = []
+
+    def savefig(self):
+        """Save figures"""
+        for item in self.figure:
+            item.savefig(item.get_label()+".png", dpi=300, transparent=False)
 
     def variables(self):
         """List all variables"""
-        this = list( self.data.columns )
-        return this
+        value = list( self.data.columns )
+        return value
 
     def ignore_features(self):
         """List all ignored features"""
-        this = [
+        value = [
             'id', 
             'result_master_id',
             'DDH_name',
@@ -78,25 +85,28 @@ class Geochem(PreprocessMixin, PlotMixin):
             'Rayl(c/s)', 
             'LT(secs)',
             'minaloggerlink']
-        return this
+
+        additional = (
+            [s for i, s in enumerate(self.variables()) if "mdl" in s] +
+            [s for i, s in enumerate(self.variables()) if "2SE" in s] 
+            )
+
+        value = value + additional
+
+        return value
 
     def features(self):
         """List all features"""
-        this = list( 
+        value = list( 
             set( self.variables() ) - set( self.ignore_features()  )
             )
-        return this 
+        return value 
 
     def element(self, item):
         """List the features of an element"""
         ptrn = "^"+item+"_"
-        this = [x for x in self.variables() if re.search(ptrn, x)]
-        return this
-
-    def debug(self):
-        """Temporary method for dev/prototyping"""
-        print("Nick")
-        #return self.__original
+        value = [x for x in self.variables() if re.search(ptrn, x)]
+        return value
 
     @staticmethod
     def read_csv( location ):
@@ -104,7 +114,7 @@ class Geochem(PreprocessMixin, PlotMixin):
         this = Geochem()
         data = pd.read_csv(location)
         this.data = data
-        this.__original = data
+        this._original = data.copy(deep=True)
         return this
 
 class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
@@ -143,6 +153,7 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
     """
 
     def __init__(self):
+        """Geochem autoML class"""
         super().__init__() #call superclass constructor
         self.unseen = []
         self.labels = []
@@ -151,6 +162,21 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.model = []
         self.active = 0
         self.plottype = "cluster"
+        self.modelopts = []
+        self.dataopts = dict()
+
+    def reset(self):
+        """Reset experiment"""
+        super().reset()
+        self.unseen = []
+        self.labels = []
+        self.experiment = []
+        self.name = ["kmeans", "kmodes"]
+        self.model = []
+        self.active = 0
+        self.plottype = "cluster"
+        self.modelopts = []
+        self.dataopts = dict()
 
     @staticmethod
     def read_csv( location ):
@@ -158,5 +184,11 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         this = GeochemML()
         data = pd.read_csv(location)
         this.data = data
-        this.__original = data
+        this._original = data.copy(deep=True)
         return this
+
+    @staticmethod
+    def get_models():
+        """List of optimizable cluster models"""
+        value = ["kmeans", "ap", "meanshift", "sc", "hclust", "dbscan", "optics", "birch", "kmodes"]
+        return value

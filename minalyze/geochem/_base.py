@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 
 class PreprocessMixin:
+    """"""
     def fit_transform(self):
         """"""
         var_str = list( self.data.columns )
@@ -18,7 +19,8 @@ class PreprocessMixin:
 
 
 class AutomlMixin:
-    def prepare(self):
+    """autoML methods"""
+    def prepare(self, silent=False):
         """Setup experiment"""
         for item in self.features():
             if self.data[item].dtype == 'int64':
@@ -26,7 +28,9 @@ class AutomlMixin:
 
         self.experiment = setup(self.data, normalize = True, 
                    ignore_features = self.ignore_features(),
-                   session_id = 123)        
+                   session_id = 123, 
+                   silent = silent, 
+                   pca = False)        
 
     def listmodels(self):
         """List cluster models"""
@@ -34,9 +38,14 @@ class AutomlMixin:
 
     def create(self):
         """Create a cluster model"""
+
         if len(self.name) != 0:
             for item in self.name:
-                mdl = create_model(item)
+                
+                if len(self.modelopts) ==0:
+                    mdl = create_model(item)
+                else:
+                    mdl = create_model(item, **self.modelopts)
                 self.model.append(mdl)
 
     def label(self):
@@ -46,6 +55,15 @@ class AutomlMixin:
                 self.labels = assign_model(model)
                 self.data[name+'_Cluster'] = self.labels['Cluster'].values
     
+
+    def get_label(self):
+
+        label_name = self.name[self.active]+'_Cluster'
+        label_array = list( self.data[label_name] )   
+
+        value = [int(sub.split(' ')[1]) for sub in label_array]
+
+        return value
 
 class ClusterPlotMixin:
     """Cluster plotting methods"""
