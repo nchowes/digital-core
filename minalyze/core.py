@@ -65,6 +65,7 @@ class Geochem(PreprocessMixin, PlotMixin):
         for item in self.figure:
             item.savefig(item.get_label()+".png", dpi=300, transparent=False)
 
+
     def variables(self):
         """List all variables"""
         value = list( self.data.columns )
@@ -88,8 +89,11 @@ class Geochem(PreprocessMixin, PlotMixin):
 
         additional = (
             [s for i, s in enumerate(self.variables()) if "mdl" in s] +
-            [s for i, s in enumerate(self.variables()) if "2SE" in s] 
+            [s for i, s in enumerate(self.variables()) if "2SE" in s]
             )
+
+        # Remove clusters from feature list 
+        # [s for i, s in enumerate(self.variables()) if "_Cluster" in s] 
 
         value = value + additional
 
@@ -150,6 +154,10 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         * 'distance' - Distance Plot   
         * 'distribution' - Distribution Plot
     
+    modelopts: 
+
+    dataopts: 
+    
     """
 
     def __init__(self):
@@ -163,7 +171,7 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.active = 0
         self.plottype = "cluster"
         self.modelopts = []
-        self.dataopts = dict()
+        self.dataopts = []
 
     def reset(self):
         """Reset experiment"""
@@ -177,6 +185,11 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.plottype = "cluster"
         self.modelopts = []
         self.dataopts = dict()
+
+    def activemodel(self):
+        """Current active model for plotting and visualization"""
+        value = self.name[self.active]+"_Cluster"
+        return value
 
     @staticmethod
     def read_csv( location ):

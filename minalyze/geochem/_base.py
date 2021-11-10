@@ -1,9 +1,10 @@
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
+from sklearn.neighbors import kneighbors_graph
 from pycaret.clustering import *
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 
 class PreprocessMixin:
     """"""
@@ -36,20 +37,44 @@ class AutomlMixin:
         """List cluster models"""
         return models()
 
+
     def create(self):
         """Create a cluster model"""
 
         if len(self.name) != 0:
-            for item in self.name:
-                
-                if len(self.modelopts) ==0:
-                    mdl = create_model(item)
+
+            #Store global model options 
+            global_model_options = self.modelopts
+
+            for item in self.name:       
+
+                if item == "hclust": 
+                    # Connectivity constraint for hierarchical cluster 
+                    depth_constraint = self.data.from_m.values.reshape(-1,1)
+                    connect = kneighbors_graph(depth_constraint, n_neighbors=2, include_self=False)
+
+                    constraints = { "connectivity": connect, 
+                        "affinity": 'euclidean', 
+                        "linkage": 'ward', 
+                        "compute_full_tree": True,
+                                }
+
+                    if isinstance(self.modelopts, dict):
+                        self.modelopts.update( constraints )
+                    else:
+                        self.modelopts = constraints
+
+                if len(self.modelopts) == 0:
+                    mdl = create_model( item )
                 else:
                     mdl = create_model(item, **self.modelopts)
                 self.model.append(mdl)
 
+                #Restore global model options 
+                self.modelopts = global_model_options
+
     def label(self):
-        """Assign model lables"""
+        """Assign model labels"""
         if type(self.model) != "list":
             for name, model in zip(self.name, self.model):
                 self.labels = assign_model(model)
@@ -57,7 +82,7 @@ class AutomlMixin:
     
 
     def get_label(self):
-
+        """"""
         label_name = self.name[self.active]+'_Cluster'
         label_array = list( self.data[label_name] )   
 
@@ -65,9 +90,64 @@ class AutomlMixin:
 
         return value
 
+
+    def aggregate(self):
+        """Aggregate by cluster"""
+        df = self.data.loc[:,self.features()]\
+            .groupby([self.activemodel()])\
+            .agg(["median"])\
+            .reset_index()
+
+        df.columns = [' '.join(col).strip() for col in df.columns.values]
+        df = df.T
+
+        names = df.iloc[0,:]
+        df = df.drop(df.index[0])
+        df.columns = names.values
+        df["type"] = df.index.str.extract(r'(ppm|pct)').values
+        df.index.name = "element"
+        df = df.sort_values(by=["type","element"])
+        df = df.reset_index()
+        return df
+
+
 class ClusterPlotMixin:
     """Cluster plotting methods"""
 
     def plotmodel(self):
-        """This function analyzes the performance of a trained model."""
+        """Plot cluster performance of a trained model."""
         plot_model( self.model[self.active], plot=self.plottype )
+
+
+    def plotcluster(self, type="pct"):
+        """Plot features by cluster"""
+
+        df = self.aggregate()
+
+        n = self.data[self.activemodel()].nunique()
+
+        fig, axes = plt.subplots(1,n, figsize=(18,4), sharey = "all" )
+        axes = axes.flatten()
+
+        for i in range(0,n):
+            sns.barplot(ax=axes[i], x="element", y=f"Cluster {i}", data=df[ df["type"] == type ], palette="Blues_d")
+            axes[i].tick_params(axis='x', rotation=90)
+
+
+    def plotscatter(self, elementX, elementY):
+        """Element scatterplot with cluster labels"""
+
+        if any( "pct" in s for s in self.element(elementX) ):
+            elementX = elementX + "_pct"
+        else:
+            elementX = elementX + "_ppm"
+
+        if any( "pct" in s for s in self.element(elementY) ):
+            elementY = elementY + "_pct"
+        else:
+            elementY = elementY + "_ppm"
+
+        fig, ax = plt.subplots( figsize=(12,8) )
+        sns.scatterplot(data=self.data, x=elementX, y=elementY, hue=self.activemodel(), 
+            palette="tab10");
+

@@ -54,12 +54,16 @@ class PlotMixin:
         y = []
         for index, row in df.iterrows():
             if index == last_row-1:
+                if len(x) != 0:
+                    x.append(row[item])
+                    y.append(row.from_m)
+                    cmap = label_colors(labels[index])[:3]
+                    ax.plot(x,y,color=cmap,linewidth=3)
                 break
+
             next_row = df.iloc[index+1]
             current_facies = row[active_name]
             next_facies = next_row[active_name]
-            #print('current: %s, next: %s\n'%(current_facies, next_facies))
-
             cmap = label_colors(labels[index])[:3]
 
             x.append(row[item])
@@ -70,5 +74,5 @@ class PlotMixin:
                 ax.plot(x,y,color=cmap,linewidth=3)
                 x = []
                 y = []
-
+                
         ax.invert_yaxis()
