@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 
 class PlotMixin:
-    """"""
+    """Plotting methods"""
 
-    def preview(self, element, labels=False):
+    def plot_element(self, element, labels=False):
         """Plot all geochem series for an element"""
 
-        items = self.element( element )
+        items = self.get_element( element )
 
         if labels:
             fig_name = "geochem-"+element+"-labeled-series"

@@ -15,9 +15,9 @@ this = Geochem.read_csv( filepath )
 
 #this.head()
 #this.tail()
-print(this.features())
+print(this.get_features())
 
-this.element("U")
+this.get_element("U")
 
 #this.debug()
 

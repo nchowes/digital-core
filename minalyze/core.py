@@ -31,14 +31,11 @@ class Geochem(PreprocessMixin, PlotMixin):
     data: pandas.DataFrame
         Shape (n_instance, n_features), where n_instance is the number of instances and 
         n_features is the number of features.
-
-    todo: remove prepared attribute 
     
     """
 
     def __init__(self):
         self.data = []
-        self.prepared = []
         self.figure = []
         self._original = []
         
@@ -57,21 +54,14 @@ class Geochem(PreprocessMixin, PlotMixin):
     def reset(self):
         """Reset data"""
         self.data = self._original.copy(deep=True)
-        self.prepared = []
         self.figure = []
 
-    def savefig(self):
-        """Save figures"""
-        for item in self.figure:
-            item.savefig(item.get_label()+".png", dpi=300, transparent=False)
-
-
-    def variables(self):
+    def get_variables(self):
         """List all variables"""
         value = list( self.data.columns )
         return value
 
-    def ignore_features(self):
+    def get_ignorefeatures(self):
         """List all ignored features"""
         value = [
             'id', 
@@ -88,29 +78,34 @@ class Geochem(PreprocessMixin, PlotMixin):
             'minaloggerlink']
 
         additional = (
-            [s for i, s in enumerate(self.variables()) if "mdl" in s] +
-            [s for i, s in enumerate(self.variables()) if "2SE" in s]
+            [s for i, s in enumerate(self.get_variables()) if "mdl" in s] +
+            [s for i, s in enumerate(self.get_variables()) if "2SE" in s]
             )
 
         # Remove clusters from feature list 
-        # [s for i, s in enumerate(self.variables()) if "_Cluster" in s] 
+        # [s for i, s in enumerate(self.get_variables()) if "_Cluster" in s] 
 
         value = value + additional
 
         return value
 
-    def features(self):
+    def get_features(self):
         """List all features"""
         value = list( 
-            set( self.variables() ) - set( self.ignore_features()  )
+            set( self.get_variables() ) - set( self.get_ignorefeatures()  )
             )
         return value 
 
-    def element(self, item):
+    def get_element(self, item):
         """List the features of an element"""
         ptrn = "^"+item+"_"
-        value = [x for x in self.variables() if re.search(ptrn, x)]
+        value = [x for x in self.get_variables() if re.search(ptrn, x)]
         return value
+
+    def savefig(self):
+        """Save figures"""
+        for item in self.figure:
+            item.savefig(item.get_label()+".png", dpi=300, transparent=False)
 
     @staticmethod
     def read_csv( location ):
@@ -135,13 +130,13 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
     experiment: global variables that can be changed using the ``set_config`` funcion
         Global variables configuring the experiment 
     
-    name: str, default = ["kmeans", "kmodes"]
+    name: str, default = ["hclust"]
         Array of models for training 
 
-    model: scikit-learn compatible object
+    model: scikit-learn compatible object, default = TODO
         Trained model object
 
-    active: index of active model scikit-learn compatible object
+    active: index of active model (scikit-learn compatible object)
         Active model
 
     plottype: str, default = 'cluster'
@@ -153,11 +148,11 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         * 'silhouette' - Silhouette Plot         
         * 'distance' - Distance Plot   
         * 'distribution' - Distribution Plot
-    
-    modelopts: 
 
-    dataopts: 
-    
+    dataopts: dict, data configuration options
+
+    modelopts: dict, model configuration options
+
     """
 
     def __init__(self):
@@ -166,12 +161,13 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.unseen = []
         self.labels = []
         self.experiment = []
-        self.name = ["kmeans", "kmodes"]
+        self.name = ["hclust"]
         self.model = []
         self.active = 0
         self.plottype = "cluster"
-        self.modelopts = []
         self.dataopts = []
+        self.modelopts = []
+
 
     def reset(self):
         """Reset experiment"""
@@ -179,14 +175,14 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.unseen = []
         self.labels = []
         self.experiment = []
-        self.name = ["kmeans", "kmodes"]
+        self.name = ["hclust"]
         self.model = []
         self.active = 0
         self.plottype = "cluster"
         self.modelopts = []
         self.dataopts = dict()
 
-    def activemodel(self):
+    def get_activemodel(self):
         """Current active model for plotting and visualization"""
         value = self.name[self.active]+"_Cluster"
         return value
@@ -199,9 +195,3 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         this.data = data
         this._original = data.copy(deep=True)
         return this
-
-    @staticmethod
-    def get_models():
-        """List of optimizable cluster models"""
-        value = ["kmeans", "ap", "meanshift", "sc", "hclust", "dbscan", "optics", "birch", "kmodes"]
-        return value
