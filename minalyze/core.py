@@ -7,7 +7,6 @@ Methods
 Visualization
     Label overlay on scatter (elemental cross plot) and downcore plots (look at striplog)
     Dimension reduction plots 
-    Summarize the clusters as tables and bar charts 
     Parallel coordinates plot 
     Pair/correlation plot (use seaborn)
 
