@@ -13,4 +13,12 @@ https://edx.netl.doe.gov/group/hfts-1-phase-1-group
 ## DOE EDX 
 omg so much stuff here - Marcellus, HFTS, CCUS stuff, lots of others https://edx.netl.doe.gov/group/
 
+## Digital rocks portal
+- eagleford here https://www.digitalrocksportal.org/projects/258
+- GOM core https://www.digitalrocksportal.org/projects/169
+- lots more small scale stuff
 
+## ERDS links
+https://github.com/zanejobe/Mines-ERDS/blob/master/LinksResources.md
+
+## more?
