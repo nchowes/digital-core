@@ -1,13 +1,13 @@
 import sys, os
 
-basepath = "/Users/nick/Dropbox/projects/consult/core-scan"
+basepath = "/Users/nick/Dropbox/projects/consult/csm/core-scan"
 sys.path.append(basepath)
 
 # For prototyping/debugging (reload if changes)
-import minalyze.core
+import digitalcore.geochemistry
 from importlib import reload
-reload(minalyze.core)
-from minalyze import Geochem, GeochemML
+reload(digitalcore.geochemistry)
+from digitalcore import Geochem, GeochemML
 
 # Read geochem data and create a custom dataframe 
 filepath = os.path.join(basepath,'./data/OOLDEA2_1m_intervals.csv')

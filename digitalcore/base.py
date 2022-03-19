@@ -1,3 +1,11 @@
+"""
+    base
+    ____
+
+    TODO
+
+"""
+
 import matplotlib.pyplot as plt
 
 class PlotMixin:
@@ -30,14 +38,12 @@ class PlotMixin:
                      ax[i].set_ylabel("Depth [m]")
                 ax[i].set_xlabel(item)
       
-
     def plot(self, ax, item):
        """Plot a geochem series"""
        x = self.data[item]
        y = self.data.from_m + 0.5
        ax.plot(x,y)
        ax.invert_yaxis()
-
 
     def plot_label(self, ax, item):
         """Plot a geochem series with cluster labels"""
