@@ -1,6 +1,26 @@
-# minalyze-ml
+# digital-core 
 
-Minalyze toolkit
+**digital-core toolkit** - ML workflows for geochemical and hyperspectral core data. 
 
+&nbsp;
 
 ## Getting started 
+
+See `demos` for example workflows.   
+
++ Geochemistry clustering workflow - `dGeochemistry.ipynb`  
++ Hyperspectral mineralmap extraction workflow - `dHyperspectral.ipynb`
+
+ &nbsp;
+
+## Workflow sessions
+
+Import a geochemistry workflow session 
+```python
+from digitalcore import GeochemML
+```
+
+Import mineralmap workflow session
+```python
+from digitalcore import MineralMap
+```
