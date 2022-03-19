@@ -1,6 +1,11 @@
-name: automl-pycaret
+name: stack-digital-core
 channels:
   - defaults
 dependencies:
   - python=3.8
-prefix: /Users/nick/miniconda3/envs/automl-pycaret
+  - pip
+  - pillow
+  - scikit-image
+  - pip:
+    - pycaret[full]
+prefix: /Users/nick/miniconda3/envs/stack-digital-core
