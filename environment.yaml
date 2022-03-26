@@ -8,4 +8,5 @@ dependencies:
   - scikit-image
   - pip:
     - pycaret[full]
+    - pytest
 prefix: /Users/nick/miniconda3/envs/stack-digital-core

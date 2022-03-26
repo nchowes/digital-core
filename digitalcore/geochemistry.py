@@ -240,22 +240,20 @@ class Geochem(PreprocessMixin, PlotMixin):
     
     """
 
-    def __init__(self):
-        self.data = []
+    def __init__(self, data):
+        self.data = data
         self.figure = []
-        self._original = []
+        self._original = None
         
     def head(self):
         """Return the first 5 rows of geochem dataframe"""
-        if len(self.data) != 0:
-           value = self.data.head()
-           display(value)
+        value = self.data.head()
+        display(value)
 
     def tail(self):
         """Return the last 5 rows of geochem dataframe"""
-        if len(self.data) != 0:
-           value = self.data.tail()
-           display(value)
+        value = self.data.tail()
+        display(value)
 
     def reset(self):
         """Reset data"""
@@ -288,9 +286,6 @@ class Geochem(PreprocessMixin, PlotMixin):
             [s for i, s in enumerate(self.get_variables()) if "2SE" in s]
             )
 
-        # Remove clusters from feature list 
-        # [s for i, s in enumerate(self.get_variables()) if "_Cluster" in s] 
-
         value = value + additional
 
         return value
@@ -316,9 +311,8 @@ class Geochem(PreprocessMixin, PlotMixin):
     @staticmethod
     def read_csv( location ):
         """Import geochem data from csv"""
-        this = Geochem()
         data = pd.read_csv(location)
-        this.data = data
+        this = Geochem(data)
         this._original = data.copy(deep=True)
         return this
 
@@ -362,9 +356,9 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
 
     """
 
-    def __init__(self):
+    def __init__(self, data):
         """Geochem autoML class"""
-        super().__init__() #call superclass constructor
+        super().__init__(data) #call superclass constructor
         self.unseen = []
         self.labels = []
         self.experiment = []
@@ -397,8 +391,7 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
     @staticmethod
     def read_csv( location ):
         """Import geochem data from csv"""
-        this = GeochemML()
         data = pd.read_csv(location)
-        this.data = data
+        this = GeochemML( data )
         this._original = data.copy(deep=True)
         return this
