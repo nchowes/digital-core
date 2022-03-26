@@ -9,4 +9,5 @@ dependencies:
   - pip:
     - pycaret[full]
     - pytest
+    - nbmake
 prefix: /Users/nick/miniconda3/envs/stack-digital-core

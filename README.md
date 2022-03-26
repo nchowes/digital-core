@@ -27,10 +27,23 @@ from digitalcore import MineralMap
 
  &nbsp;
 
- 
+
 ## Test
 
-To run tests, from base directory
+To run package tests from base directory
 ```shell
 pytest -v -c./tests/pytest.ini
+```
+
+To run notebook tests (smoke tests) from base directory, ignoring certain notebooks. 
+```shell 
+pytest -v -c ./tests/pytest.ini --collect-only --nbmake ./demos \
+--ignore=demos/dAutoML.ipynb \
+--ignore=demos/dUnsupervised.ipynb
+```
+
+```shell
+pytest -v -c ./tests/pytest.ini --nbmake ./demos \
+--ignore=demos/dAutoML.ipynb \
+--ignore=demos/dUnsupervised.ipynb
 ```
