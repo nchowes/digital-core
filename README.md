@@ -24,9 +24,13 @@ Import mineralmap workflow session
 ```python
 from digitalcore import MineralMap
 ```
+
+ &nbsp;
+
+ 
 ## Test
 
-From base directory
-```
+To run tests, from base directory
+```shell
 pytest -v -c./tests/pytest.ini
 ```
