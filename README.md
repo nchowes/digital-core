@@ -6,7 +6,7 @@
 
 ## Getting started 
 
-See `demos` for example workflows.   
+See `demos` for example workflows.    
 
 + Geochemistry clustering workflow - `dGeochemistry.ipynb`  
 + Hyperspectral mineralmap extraction workflow - `dHyperspectral.ipynb`
