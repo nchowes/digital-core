@@ -1,6 +1,6 @@
 # digital-core 
 
-**digital-core toolkit** - ML workflows for core data. Currently support for geochemical and hyperspectral data. Project in active development.  
+**digital-core toolkit** - ML workflows for core data. Currently support for geochemical and hyperspectral data. Project in active development.   
 
 &nbsp;
 
