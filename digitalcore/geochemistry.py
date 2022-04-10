@@ -42,11 +42,20 @@ class AutomlMixin:
             if self.data[item].dtype == 'int64':
                 self.data[item] = self.data[item].astype( 'float64' )
 
-        self.experiment = setup(self.data, normalize = True, 
-                   ignore_features = self.get_ignorefeatures(),
-                   session_id = 123, 
-                   silent = silent, 
-                   pca = False)        
+        #merge default constraints with user defined constaints
+        constraints = {
+            "session_id": 123,
+            "normalize": True, 
+            "pca": False
+            }
+        constraints.update( self.dataopts )
+        self.dataopts = constraints
+
+        self.experiment = setup(self.data, 
+            ignore_features = self.get_ignorefeatures(),
+            silent = silent,
+            **self.dataopts 
+            )        
 
     def create(self):
         """Create a cluster model"""
@@ -54,7 +63,7 @@ class AutomlMixin:
         if len(self.name) != 0:
 
             #Store global model options 
-            global_model_options = self.modelopts
+            global_model_options = self.modelopts.copy()
 
             for item in self.name:       
 
@@ -121,7 +130,6 @@ class AutomlMixin:
                 .reset_index(drop=True)
 
         df.columns = df.columns.str.lower()
-
         return df
 
     def get_listmodels(self):
@@ -137,7 +145,6 @@ class AutomlMixin:
         label_array = list( self.data[label_name] )   
 
         value = [int(sub.split(' ')[1]) for sub in label_array]
-
         return value
     
   
@@ -145,7 +152,7 @@ class ClusterPlotMixin:
     """Cluster plotting methods"""
 
     def plotmodel(self):
-        """Plot cluster performance of a trained model."""
+        """Plot cluster performance of a trained model"""
         plot_model( self.model[self.active], plot=self.plottype )
 
 
@@ -234,7 +241,7 @@ class ClusterPlotMixin:
 class Geochem(PreprocessMixin, PlotMixin):
     """Custom dataframe for geochem data
     
-    data: pandas.DataFrame
+    data: pd.DataFrame
         Shape (n_instance, n_features), where n_instance is the number of instances and 
         n_features is the number of features.
     
