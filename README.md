@@ -35,13 +35,14 @@ To run package tests from base directory
 pytest -v -c./tests/pytest.ini
 ```
 
-To run notebook tests (smoke tests) from base directory, ignoring certain notebooks. 
+To dry-run and notebook test configuration (not run)
 ```shell 
 pytest -v -c ./tests/pytest.ini --collect-only --nbmake ./demos \
 --ignore=demos/dAutoML.ipynb \
 --ignore=demos/dUnsupervised.ipynb
 ```
 
+To run notebook tests (smoke tests) from base directory, ignoring certain notebooks. 
 ```shell
 pytest -v -c ./tests/pytest.ini --nbmake ./demos \
 --ignore=demos/dAutoML.ipynb \

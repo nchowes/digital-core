@@ -17,7 +17,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.neighbors import kneighbors_graph
+from sklearn.cluster import AgglomerativeClustering
 from pycaret.clustering import *
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -238,7 +240,7 @@ class ClusterPlotMixin:
         return metric
 
 
-class Geochem(PreprocessMixin, PlotMixin):
+class GeochemBase(PreprocessMixin, PlotMixin):
     """Custom dataframe for geochem data
     
     data: pd.DataFrame
@@ -324,7 +326,80 @@ class Geochem(PreprocessMixin, PlotMixin):
         return this
 
 
-class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
+class Geochem(GeochemBase):
+    """_summary_
+
+    Parameters
+    ----------
+    GeochemBase : _type_
+        _description_
+    """
+    def __init__(self,data):
+        super().__init__(data) #call superclass constructor
+        self.model = []
+        self.num_clusters = 3
+        self._prepared = [] 
+
+    def reset(self):
+        super().reset()
+        self.model = []
+        
+    def prepare(self):
+        """Prepare data"""
+        for item in self.get_features():
+            if self.data[item].dtype == 'int64':
+                self.data[item] = self.data[item].astype( 'float64' )
+
+        data = self.data.copy(deep=True)
+        data = data.drop( columns=self.get_ignorefeatures() )
+
+        pipeline = Pipeline([ ('scaling', StandardScaler()) ])
+        #('pca', PCA(n_components=10)
+        X = pipeline.fit_transform(data)
+
+        self._prepared = pd.DataFrame(X, columns=data.columns)
+        
+    def create(self):
+        if len(self._prepared):
+            # Connectivity constraint for hierarchical cluster 
+            depth_constraint = self.data.from_m.values.reshape(-1,1)
+            connect = kneighbors_graph(depth_constraint, n_neighbors=2, include_self=False)
+
+            # Fit model
+            self.model = AgglomerativeClustering(n_clusters=self.num_clusters, 
+                connectivity=connect, 
+                affinity='euclidean', 
+                linkage='ward', 
+                compute_full_tree=True)  
+
+    def label(self):
+        if self.model:
+            self.data["hclust_Cluster"] = self.model.fit_predict(self._prepared) 
+            self.data["hclust_Cluster"] = "Cluster " + self.data["hclust_Cluster"].astype("str")
+
+    def get_label(self):
+        """Return label array for the active model"""
+        label_name = "hclust_Cluster"
+        label_array = list( self.data[label_name] )   
+
+        value = [int(sub.split(' ')[1]) for sub in label_array]
+        return value
+
+    def get_activemodel(self):
+        """Current active model for plotting and visualization"""
+        value = "hclust_Cluster"
+        return value
+
+    @staticmethod
+    def read_csv( location ):
+        """Import geochem data from csv"""
+        data = pd.read_csv(location)
+        this = Geochem( data )
+        this._original = data.copy(deep=True)
+        return this
+
+
+class GeochemML(GeochemBase, AutomlMixin, ClusterPlotMixin):
     """Custom dataframe for geochem data supporting autoML with PyCaret
 
     data: pandas.DataFrame
@@ -375,7 +450,6 @@ class GeochemML(Geochem, AutomlMixin, ClusterPlotMixin):
         self.plottype = "cluster"
         self.dataopts = []
         self.modelopts = []
-
 
     def reset(self):
         """Reset experiment"""
