@@ -4,11 +4,11 @@ channels:
 dependencies:
   - python=3.8
   - pip
-  - setuptools
-  - wheel
   - pillow
   - scikit-image
   - pip:
+    - wheel
+    - setuptools
     - pycaret[full]
     - pytest
     - nbmake
