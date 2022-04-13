@@ -1,7 +1,7 @@
 # digital-core 
 
-**digital-core toolkit** - ML workflows for core data. Project in active development.   
-
+**digital-core toolkit** - ML workflows for core data. Project in active development.     
+[![CircleCI](https://circleci.com/gh/nchowes/digital-core/tree/dev_geochem_simple.svg?style=svg&circle-token=4269d33c29007ef65014893358fc16b2a8555e82)](https://circleci.com/gh/nchowes/digital-core/?branch=dev_geochem_simple)
 &nbsp;
 
 ## Getting started 
@@ -11,25 +11,15 @@ Install
 conda env create -f environment.yml
 ```
 
+ &nbsp;
+
+ ## Demos 
 
 See `demos` for example workflows.    
 
 + Geochemistry clustering workflow - `dGeochemistry.ipynb`  
 + Hyperspectral mineralmap extraction workflow - `dHyperspectral.ipynb`
 
- &nbsp;
-
-## Workflow sessions
-
-Import a geochemistry workflow session 
-```python
-from digitalcore import GeochemML
-```
-
-Import mineralmap workflow session
-```python
-from digitalcore import MineralMap
-```
 
  &nbsp;
 
