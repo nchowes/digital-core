@@ -5,6 +5,10 @@ jobs:
       - image: continuumio/miniconda3
     steps:
       - checkout
+      - run: 
+          name: Install linux compiler 
+          command: |
+            sudo apt install build-essential
       - run:
           name: Create conda environment
           command: |
