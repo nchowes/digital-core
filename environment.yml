@@ -7,8 +7,8 @@ dependencies:
   - pillow
   - scikit-image
   - pip:
-    - wheel
-    - setuptools
+    - p5py
+    - PEP517
     - pycaret[full]
     - pytest
     - nbmake
