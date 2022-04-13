@@ -6,6 +6,12 @@
 
 ## Getting started 
 
+Install 
+```shell
+conda env create -f environment.yml
+```
+
+
 See `demos` for example workflows.    
 
 + Geochemistry clustering workflow - `dGeochemistry.ipynb`  

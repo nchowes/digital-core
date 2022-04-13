@@ -343,15 +343,20 @@ class Geochem(GeochemBase):
     def reset(self):
         super().reset()
         self.model = []
+        self.num_clusters = 3
+        self._prepared = [] 
         
     def prepare(self):
         """Prepare data"""
         for item in self.get_features():
             if self.data[item].dtype == 'int64':
                 self.data[item] = self.data[item].astype( 'float64' )
-
+        
         data = self.data.copy(deep=True)
         data = data.drop( columns=self.get_ignorefeatures() )
+
+        if "hclust_Cluster" in data.columns:
+            data = data.drop(columns="hclust_Cluster")
 
         pipeline = Pipeline([ ('scaling', StandardScaler()) ])
         #('pca', PCA(n_components=10)
