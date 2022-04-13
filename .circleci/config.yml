@@ -8,7 +8,8 @@ jobs:
       - run: 
           name: Install linux compiler 
           command: |
-            apt install build-essential
+            apt-get update
+            apt-get -y install gcc
       - run:
           name: Create conda environment
           command: |
