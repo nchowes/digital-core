@@ -8,7 +8,7 @@ jobs:
       - run: 
           name: Install linux compiler 
           command: |
-            sudo apt install build-essential
+            apt install build-essential
       - run:
           name: Create conda environment
           command: |
