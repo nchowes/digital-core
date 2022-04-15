@@ -1,7 +1,7 @@
 # digital-core 
 
-**digital-core toolkit** - ML workflows for core data. Project in active development.     
-[![CircleCI](https://circleci.com/gh/nchowes/digital-core/tree/dev_geochem_simple.svg?style=svg&circle-token=4269d33c29007ef65014893358fc16b2a8555e82)](https://circleci.com/gh/nchowes/digital-core/?branch=dev_geochem_simple)
+**digital-core toolkit** - ML workflows for core data. Project in active development.  
+[![CircleCI](https://circleci.com/gh/nchowes/digital-core/tree/main.svg?style=svg)](https://circleci.com/gh/nchowes/digital-core/tree/main)
 &nbsp;
 
 ## Getting started 
