@@ -6,7 +6,7 @@
 
 ## Getting started 
 
-Install 
+Installation  
 ```shell
 conda env create -f environment.yml
 ```

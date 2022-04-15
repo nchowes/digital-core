@@ -59,15 +59,28 @@ class AutomlMixin:
             **self.dataopts 
             )        
 
+    def add(self, name, modelopts={}):
+        """_summary_
+
+        Parameters
+        ----------
+        name : _type_
+            _description_
+        modelopts : dict, optional
+            _description_, by default {}
+        """
+        self.name.append( name )
+        self.modelopts.append( modelopts )
+
     def create(self):
         """Create a cluster model"""
 
         if len(self.name) != 0:
+            
+            #reset 
+            self.model = []
 
-            #Store global model options 
-            global_model_options = self.modelopts.copy()
-
-            for item in self.name:       
+            for i,item in enumerate(self.name):       
 
                 if item == "hclust": 
                     # Connectivity constraint for hierarchical cluster 
@@ -80,26 +93,26 @@ class AutomlMixin:
                         "compute_full_tree": True,
                                 }
 
-                    if isinstance(self.modelopts, dict):
-                        self.modelopts.update( constraints )
+                    if isinstance(self.modelopts[i], dict):
+                        self.modelopts[i].update( constraints )
                     else:
-                        self.modelopts = constraints
+                        self.modelopts[i] = constraints
 
-                if len(self.modelopts) == 0:
+                if len(self.modelopts[i]) == 0:
                     mdl = create_model( item )
                 else:
-                    mdl = create_model(item, **self.modelopts)
+                    mdl = create_model(item, **self.modelopts[i])
                 self.model.append(mdl)
 
-                #Restore global model options 
-                self.modelopts = global_model_options
 
     def label(self):
         """Assign model labels"""
         if type(self.model) != "list":
-            for name, model in zip(self.name, self.model):
+            for i, (name, model) in enumerate(zip(self.name, self.model)):
+                trial = name + str(i)
+                print(trial)
                 self.labels = assign_model(model)
-                self.data[name+'_Cluster'] = self.labels['Cluster'].values
+                self.data[trial+'_Cluster'] = self.labels['Cluster'].values
     
     def run(self):
         """Prepare, fit, and label dataset"""
@@ -109,7 +122,10 @@ class AutomlMixin:
 
     def aggregate(self, output="stack"):
         """Aggregate by cluster"""
-        df = self.data.loc[:,self.get_features()]\
+
+        features_and_label = self.get_features() + [self.get_activemodel()]
+
+        df = self.data.loc[:,features_and_label]\
             .groupby([self.get_activemodel()])\
             .agg(["median"])\
             .reset_index()
@@ -143,7 +159,7 @@ class AutomlMixin:
 
     def get_label(self):
         """Return label array for the active model"""
-        label_name = self.name[self.active]+'_Cluster'
+        label_name = self.name[self.active]+str(self.active)+'_Cluster'
         label_array = list( self.data[label_name] )   
 
         value = [int(sub.split(' ')[1]) for sub in label_array]
@@ -241,8 +257,11 @@ class ClusterPlotMixin:
 
 
 class GeochemBase(PreprocessMixin, PlotMixin):
-    """Custom dataframe for geochem data
+    """Base class custom dataframe for geochem data
     
+    Parameters
+    ----------
+
     data: pd.DataFrame
         Shape (n_instance, n_features), where n_instance is the number of instances and 
         n_features is the number of features.
@@ -295,7 +314,14 @@ class GeochemBase(PreprocessMixin, PlotMixin):
             [s for i, s in enumerate(self.get_variables()) if "2SE" in s]
             )
 
-        value = value + additional
+        tF_labeled = self.data.columns\
+            .str.contains( "_Cluster" )
+
+        if any( tF_labeled ):
+            labeled = list(self.data.columns[tF_labeled])
+        else:
+            labeled = []
+        value = value + additional + labeled
 
         return value
 
@@ -317,22 +343,22 @@ class GeochemBase(PreprocessMixin, PlotMixin):
         for item in self.figure:
             item.savefig(item.get_label()+".png", dpi=300, transparent=False)
 
-    @staticmethod
-    def read_csv( location ):
-        """Import geochem data from csv"""
-        data = pd.read_csv(location)
-        this = Geochem(data)
-        this._original = data.copy(deep=True)
-        return this
+    #@staticmethod
+    #def read_csv( location ):
+    #    """Import geochem data from csv"""
+    #    data = pd.read_csv(location)
+    #    this = GeochemBase(data)
+    #    this._original = data.copy(deep=True)
+    #    return this
 
 
-class Geochem(GeochemBase):
-    """_summary_
+class GeochemCluster(GeochemBase):
+    """Cluster geochemistry data using depth constrained hierarchical clustering. 
 
     Parameters
     ----------
-    GeochemBase : _type_
-        _description_
+    GeochemBase : geochemistry.GeochemBase
+        Base class custom dataframe for geochem data
     """
     def __init__(self,data):
         super().__init__(data) #call superclass constructor
@@ -354,9 +380,6 @@ class Geochem(GeochemBase):
         
         data = self.data.copy(deep=True)
         data = data.drop( columns=self.get_ignorefeatures() )
-
-        if "hclust_Cluster" in data.columns:
-            data = data.drop(columns="hclust_Cluster")
 
         pipeline = Pipeline([ ('scaling', StandardScaler()) ])
         #('pca', PCA(n_components=10)
@@ -399,26 +422,22 @@ class Geochem(GeochemBase):
     def read_csv( location ):
         """Import geochem data from csv"""
         data = pd.read_csv(location)
-        this = Geochem( data )
+        this = GeochemCluster( data )
         this._original = data.copy(deep=True)
         return this
 
 
-class GeochemML(GeochemBase, AutomlMixin, ClusterPlotMixin):
-    """Custom dataframe for geochem data supporting autoML with PyCaret
+class GeochemClusterExperiment(GeochemBase, AutomlMixin, ClusterPlotMixin):
+    """Clustering experiments for geochemistry data using PyCaret autoML 
 
     data: pandas.DataFrame
         Training data with shape (n_instance, n_features), where n_instance is the number of instances and 
-        n_features is the number of features.
-    
-    unseen: pandas.DataFrame
-        Test data with shape (n_instance, n_features), where n_instance is the number of instances and 
         n_features is the number of features.
 
     experiment: global variables that can be changed using the ``set_config`` funcion
         Global variables configuring the experiment 
     
-    name: str, default = ["hclust"]
+    name: str, default = []
         Array of models for training 
 
     model: scikit-learn compatible object, default = TODO
@@ -446,10 +465,9 @@ class GeochemML(GeochemBase, AutomlMixin, ClusterPlotMixin):
     def __init__(self, data):
         """Geochem autoML class"""
         super().__init__(data) #call superclass constructor
-        self.unseen = []
         self.labels = []
         self.experiment = []
-        self.name = ["hclust"]
+        self.name = []
         self.model = []
         self.active = 0
         self.plottype = "cluster"
@@ -459,25 +477,32 @@ class GeochemML(GeochemBase, AutomlMixin, ClusterPlotMixin):
     def reset(self):
         """Reset experiment"""
         super().reset()
-        self.unseen = []
         self.labels = []
         self.experiment = []
-        self.name = ["hclust"]
+        self.name = []
         self.model = []
         self.active = 0
         self.plottype = "cluster"
         self.modelopts = []
         self.dataopts = dict()
 
+    def reset_trials(self):
+        """Reset trials"""
+        self.labels = []
+        self.name = []
+        self.model = []
+        self.modelopts = []
+        self.active = 0
+
     def get_activemodel(self):
         """Current active model for plotting and visualization"""
-        value = self.name[self.active]+"_Cluster"
+        value = self.name[self.active]+str(self.active)+"_Cluster"
         return value
 
     @staticmethod
     def read_csv( location ):
         """Import geochem data from csv"""
         data = pd.read_csv(location)
-        this = GeochemML( data )
+        this = GeochemClusterExperiment( data )
         this._original = data.copy(deep=True)
         return this

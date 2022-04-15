@@ -3,13 +3,13 @@
     ------------
     
     Machine learning for digital core. 
-    See XXXX for complete documentation
+    
 """
 
 __version__ = '0.1.0'
 
-from .geochemistry import Geochem, GeochemML
+from .geochemistry import GeochemCluster, GeochemClusterExperiment
 from .hyperspectral import MineralMap
 
-__all__ = ['Geochem', 'GeochemML', 'MineralMap']
+__all__ = ['GeochemCluster', 'GeochemClusterExperiment', 'MineralMap']
 

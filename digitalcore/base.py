@@ -1,8 +1,8 @@
 """
     base
-    ____
+    ----
 
-    TODO
+    Shared base classes and mixins 
 
 """
 

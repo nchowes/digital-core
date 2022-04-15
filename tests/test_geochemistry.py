@@ -7,10 +7,10 @@ sys.path.append(
     os.path.join( os.path.dirname( os.path.abspath(__file__)) , "..")
 )
 
-from digitalcore import Geochem, GeochemML
+from digitalcore import GeochemCluster, GeochemClusterExperiment
 
 #Unit tests for geochemistry module 
-class TestGeochem:
+class TestGeochemCluster:
     def test_classmethod(self):
         location =os.path.join( 
             os.path.dirname( os.path.abspath(__file__) ), 
@@ -19,13 +19,13 @@ class TestGeochem:
                "OOLDEA2_1m_intervals.csv"
          )
 
-        o = Geochem.read_csv( location )
+        o = GeochemCluster.read_csv( location )
         assert isinstance(o.data, pd.DataFrame)
         assert [] == o.figure
         assert o.data.equals(o._original)
 
 
-class TestGeochemML:
+class TestGeochemClusterExperiment:
     def test_classmethod(self):
         location =os.path.join( 
             os.path.dirname( os.path.abspath(__file__) ), 
@@ -34,7 +34,7 @@ class TestGeochemML:
                "OOLDEA2_1m_intervals.csv"
          )
 
-        o = GeochemML.read_csv( location )
+        o = GeochemClusterExperiment.read_csv( location )
         assert isinstance(o.data, pd.DataFrame)
         assert [] == o.figure
         assert o.data.equals(o._original)

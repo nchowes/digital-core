@@ -1,7 +1,6 @@
 
 ## TODO 
 
-
 + In-progress
     + Kolmogorov–smirnov statistic per element-cluster (highlight discriminative elements )
     + Linkage diagram
