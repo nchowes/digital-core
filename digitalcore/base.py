@@ -1,8 +1,8 @@
 """
     base
-    ____
+    ----
 
-    TODO
+    Shared base classes and mixins 
 
 """
 
@@ -48,7 +48,7 @@ class PlotMixin:
     def plot_label(self, ax, item):
         """Plot a geochem series with cluster labels"""
 
-        active_name = self.name[self.active]+"_Cluster"
+        active_name = self.get_activemodel()
 
         labels = self.get_label()
         label_colors = plt.get_cmap('tab10') 
