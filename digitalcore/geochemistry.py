@@ -169,9 +169,9 @@ class AutomlMixin:
 class ClusterPlotMixin:
     """Cluster plotting methods"""
 
-    def plotmodel(self):
+    def plotmodel(self, display_format=None):
         """Plot cluster performance of a trained model"""
-        plot_model( self.model[self.active], plot=self.plottype )
+        plot_model(self.model[self.active], plot=self.plottype, display_format=display_format)
 
 
     def plot_aggregates(self, by="feature", type="pct"):

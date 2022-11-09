@@ -6,8 +6,9 @@ dependencies:
   - pip
   - pillow
   - scikit-image
+  - streamlit
   - pip:
     - pycaret[full]
     - pytest
     - nbmake
-prefix: /Users/nick/miniconda3/envs/stack-digital-core
+#prefix: /Users/nick/miniconda3/envs/stack-digital-core
