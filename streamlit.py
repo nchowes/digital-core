@@ -35,30 +35,33 @@ def main():
 
         experiment.prepare(silent=True)
 
+        experiment.add("hclust", {'num_clusters': 4})
+        experiment.create()
+        experiment.label()
+
+        experiment.plottype = "elbow"
+        experiment.plotmodel(display_format='streamlit')
+
         n_clusters = st.select_slider("Choose number of clusters", 
                                      options=range(2, 10), value=4)
 
+        element = st.selectbox(
+            "Choose an element to plot", 
+            sorted(set([f.split('_')[0] for f in features])),
+        )
+
+        def plot_element():
+            image = make_element_image(element, experiment)
+            st.image(image)
+
 
         if st.button("Submit"):
-
+            experiment.prepare(silent=True)
+            experiment.reset_trials()
             experiment.add("hclust", {'num_clusters': n_clusters})
             experiment.create()
             experiment.label()
-
-            experiment.plottype = "elbow"
-            experiment.plotmodel(display_format='streamlit')
-
-            
-            element = st.selectbox(
-                "Choose an element to plot", 
-                sorted(set([f.split('_')[0] for f in features])),
-            )
-
-            def plot_element():
-                image = make_element_image(element, experiment)
-                st.image(image, caption='Sunrise by the mountains')
-
-            st.button("Plot", on_click=plot_element())
+            plot_element()
 
 
 
