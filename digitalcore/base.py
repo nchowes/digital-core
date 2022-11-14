@@ -38,7 +38,7 @@ class PlotMixin:
                      ax[i].set_ylabel("Depth [m]")
                 ax[i].set_xlabel(item)
 
-        return(fig)
+        return fig
       
     def plot(self, ax, item):
        """Plot a geochem series"""

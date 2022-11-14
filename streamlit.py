@@ -1,15 +1,13 @@
-import sys, os
 import numpy as np
 import streamlit as st
 from digitalcore import GeochemClusterExperiment
 
 
-# Caches so that it is not rerun every time the app is rerun
-@st.experimental_memo
 def create_experiment(uf):
     return GeochemClusterExperiment.read_csv(uf)
 
-
+# Probably not strictly necessary, but I was having some issues
+# using the pyplot figure directly in streamlit
 def make_element_image(element, experiment):
     fig = experiment.plot_element(element, labels=True)
     fig.canvas.draw()
@@ -62,8 +60,6 @@ def main():
             experiment.create()
             experiment.label()
             plot_element()
-
-
 
 
 if __name__ == "__main__":
